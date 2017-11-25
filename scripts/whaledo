@@ -19,26 +19,52 @@
 # $ whaledo rgdev rake test # Run `rake test` in a Docker container using the duckinator/rubygems-development image.
 # $ whaledo unalias rgdev
 
-import re
+import os
+import json
 import click
 
-@click.group()
-def cli():
-    pass
+class whaledo_cli:
+    def __init__(self, filename):
+        self.aliases = {}
+        aliases = self.load_aliases(alias_file)
+        try:
+            self.cli()
+        finally:
+            print("??????")
+            self.save_aliases(alias_file)
 
-@click.command()
-@click.argument("short_name")
-@click.argument("long_name")
-def alias(short_name, long_name):
-    print("Alias: {}={}".format(short_name, long_name))
+    def load_aliases(self, filename):
+        print("Loading aliases.")
+        if os.path.isfile(filename) and os.stat(filename).st_size != 0:
+            print("???")
+            with open(filename, 'r') as f:
+                json.load(f)
 
-@click.command()
-@click.argument("short_name")
-def unalias(short_name):
-    print("Unalias: {}".format(short_name))
+    def save_aliases(self, filename):
+        print("Saving aliases.")
+        with open(filename, 'w') as f:
+            json.dump(self.aliases, f)
 
-cli.add_command(alias)
-cli.add_command(unalias)
+    @click.group()
+    def cli(self):
+        print("meep")
+        pass
+
+    @cli.command()
+    @click.argument("short_name")
+    @click.argument("long_name")
+    def alias(self, short_name, long_name):
+        self.aliases[short_name] = long_name
+        print("Alias: {}={}".format(short_name, long_name))
+
+    @cli.command()
+    @click.argument("short_name")
+    def unalias(self, short_name):
+        print("Unalias: {}".format(short_name))
+
+    cli.add_command(alias)
+    cli.add_command(unalias)
 
 if __name__ == '__main__':
-    cli()
+    alias_file = os.path.join(os.environ['HOME'], '.whaledo_aliases.json')
+    whaledo_cli(alias_file)
