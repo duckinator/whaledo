@@ -19,58 +19,26 @@
 # $ whaledo rgdev rake test # Run `rake test` in a Docker container using the duckinator/rubygems-development image.
 # $ whaledo unalias rgdev
 
-# All of the code is garbage.
-
-
-import sys
-
-#def cmd_help(args):
-#    ...
-#
-#def cmd_alias(args):
-#    ...
-#
-#def cmd_unalias(args):
-#    ...
-#
-#def cmd_run(args):
-#    ...
-#
-#
-#def dispatch(args):
-#    if len(args) == 1:
-#        args[1] = "--help"
-#
-#    commands = {
-#        '-h':       cmd_help,
-#        '--help':   cmd_help,
-#        'alias':    cmd_alias,
-#        'unalias':  cmd_unalias, 
-#    }
-#
-#    cmd_args = args[2:]
-#    if args[1] in command:
-#        commands[args[1]](cmd_args)
-#    else:
-#        cmd_run(cmd_args)
-
-
-import argparse
 import re
+import click
 
-def alias_map(value):
-    pattern =  re.compile("[A-Za-z0-9]=[A-Za-z0-9]")
-    if pattern.match(value):
-        return value
-    raise argparse.ArgumentTypeError("{:s} is invalid, must be in the form of SHORTNAME=LONGNAME".format(value))
+@click.group()
+def cli():
+    pass
 
-mainparser = argparse.ArgumentParser(description="Woof")
-mainparser.add_argument("command", choices=['alias', 'unalias', 'woof'], help="Command to run")
-(args, remainder) = mainparser.parse_known_args(sys.argv[1:])
+@click.command()
+@click.argument("short_name")
+@click.argument("long_name")
+def alias(short_name, long_name):
+    print("Alias: {}={}".format(short_name, long_name))
 
-if args.command == 'alias':
-    aliasparser = argparse.ArgumentParser(description="alias args")
-    aliasparser.add_argument("aliasmap", type=alias_map, help="Command to alias in the form of SHORTNAME=LONGNAME")
-    args = aliasparser.parse_args(remainder)
-    print("Found {}".format(args.aliasmap))
+@click.command()
+@click.argument("short_name")
+def unalias(short_name):
+    print("Unalias: {}".format(short_name))
 
+cli.add_command(alias)
+cli.add_command(unalias)
+
+if __name__ == '__main__':
+    cli()
