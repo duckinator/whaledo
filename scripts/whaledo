@@ -1,77 +1,76 @@
 #!/usr/bin/env python
 
+# ;~; *sad dog noises*
+
+
+# whaledo [-h|--help|--version]
+# whaledo alias SHORTNAME=LONGNAME # Alias SHORTNAME to the Docker Hub image LONGNAME.
+# whaledo unalias SHORTNAME        # Unalias SHORTNAME.
+# whaledo LONGNAME COMMAND         # Run command in the Docker image referenced by LONGNAME
+# whaledo SHORTNAME COMMAND        # Run COMMAND in the Docker image referenced by the LONGNAME that SHORTNAME is aliased to.
+#
+# TODO: Figure out how to handle volumes and such.
+# NOTE: I am going to be making a repo of Dockerfiles specifically for this, so I am okay using some kind of convention for mounting things instead of making it infinitely tweakable.
+#       E.g., always mounting . to /tmp/work or $HOME to /tmp/home or something like that, or doing `whaledo [SHORTNAME|LONGNAME] COMMAND [MOUNTPOINTS...]` and just doing a 1:1 mapping.
+#       An alternative approach could be to get metadata files from the whaledo-containers GitHub repo that explain what should be mounted where, but use the containers from Docker Hub just to make it quicker/less annoying.
+#
+# Example usage:
+# $ whaledo alias rgdev=duckinator/rubygems-development
+# $ whaledo rgdev rake test # Run `rake test` in a Docker container using the duckinator/rubygems-development image.
+# $ whaledo unalias rgdev
+
+# All of the code is garbage.
+
+
 import sys
-import argparse
-import pkg_resources
 
-aliases={}
-
-def alias(short_name: str, long_name: str):
-    if len(short_name) == 0:
-        sys.abort 
-    elif len(long_name) == 0:
-    aliases[short_name] = long_name
-
-#if len(sys.args) == 1:
-#    sys.args.append('--help')
-
-parser = argparse.ArgumentParser(description='Manage and run interactive tools distributed in Docker containers.')
-#parser.add_argument('--version', action='version',
-#                    version=pkg_resources.get_distribution("whaledo").version)
-subparsers = parser.add_subparsers()
-
-alias_parser = subparsers.add_parser('alias')
-alias_parser.add_argument('short_name')
-alias_parser.add_argument('long_name')
-alias_parser.set_defaults(func=alias)
-
-unalias_parser = subparsers.add_parser('unalias')
-unalias_parser.add_argument('short_name')
-unalias_parser.set_defaults(func=unalias)
-
-if __name__ == '__main__':
-    args = parser.parse_ags()
-    parser.func(args)
-
-exit()
-
-args = parser.parse_args(args)
-
-print(args)
-
-def cmd_alias(args):
-    print("NOT IMPLEMENTED")
-
-def cmd_run(args):
-    print("NOT IMPLEMENTED")
-
-#def command_dispatch(args):
-#    command_map = {
-#        'none':     cmd_help,
+#def cmd_help(args):
+#    ...
+#
+#def cmd_alias(args):
+#    ...
+#
+#def cmd_unalias(args):
+#    ...
+#
+#def cmd_run(args):
+#    ...
+#
+#
+#def dispatch(args):
+#    if len(args) == 1:
+#        args[1] = "--help"
+#
+#    commands = {
+#        '-h':       cmd_help,
+#        '--help':   cmd_help,
 #        'alias':    cmd_alias,
-#        'default':  cmd_run,
+#        'unalias':  cmd_unalias, 
 #    }
 #
-#    if len(args) == 1 or args[1][0] == '-':
-#        command = 'none'
-#    elif args[1] in command_map:
-#        command = args[1]
+#    cmd_args = args[2:]
+#    if args[1] in command:
+#        commands[args[1]](cmd_args)
 #    else:
-#        command = 'default'
-#
-#    return command_map[command](args[1:])
-
-ret = command_dispatch(sys.argv)
+#        cmd_run(cmd_args)
 
 
-exit()
+import argparse
+import re
 
-parser = argparse.ArgumentParser(description='Manage and run interactive tools distributed in Docker containers.')
-parser.add_argument('', metavar='N', type=int, nargs='+',
-                    help='an integer for the accumulator')
-parser.add_argument('--sum', dest='accumulate', action='store_const',
-                    const=sum, default=max,
-                    help='sum the integers (default: find the max)')
+def alias_map(value):
+    pattern =  re.compile("[A-Za-z0-9]=[A-Za-z0-9]")
+    if pattern.match(value):
+        return value
+    raise argparse.ArgumentTypeError("{:s} is invalid, must be in the form of SHORTNAME=LONGNAME".format(value))
 
-def docker():
-    pass
+mainparser = argparse.ArgumentParser(description="Woof")
+mainparser.add_argument("command", choices=['alias', 'unalias', 'woof'], help="Command to run")
+(args, remainder) = mainparser.parse_known_args(sys.argv[1:])
+
+if args.command == 'alias':
+    aliasparser = argparse.ArgumentParser(description="alias args")
+    aliasparser.add_argument("aliasmap", type=alias_map, help="Command to alias in the form of SHORTNAME=LONGNAME")
+    args = aliasparser.parse_args(remainder)
+    print("Found {}".format(args.aliasmap))
+
