@@ -22,6 +22,7 @@ import click
 
 aliases = {}
 
+# ASSUMPTION: Will never be given a file with nothing but a newline in it.
 def load_aliases(filename):
     ret = None
     if os.path.isfile(filename) and os.stat(filename).st_size != 0:
@@ -52,11 +53,14 @@ def alias(short_name, long_name):
 def unalias(short_name):
     return aliases.pop(short_name, None)
 
+# FIXME: This function is pure sadness.
 @cli.command()
 def aliases():
-    print("Aliases:")
+    separator_length = max(map(len, aliases)) + 8 # Arbitrary offset (8).
+    separator_length = min(separator_length, 20)  # Arbitrary length.
+    print(("ALIAS{:<" + str(separator_length) + "}REPOSITORY").format(' '))
     for short_name in aliases:
-        print("{}\t\t{}".format(short_name, aliases[short_name]))
+        print(("{}{:<" + str(separator_length) + "}{}").format(short_name, ' ', aliases[short_name]))
 
 cli.add_command(alias)
 cli.add_command(unalias)
