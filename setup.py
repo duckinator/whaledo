@@ -8,6 +8,10 @@ setup(
     author_email='me@duckie.co',
     url='https://github.com/duckinator/whaledo',
     license='MIT',
-    scripts=['scripts/whaledo'],
+    entry_points={
+        'console_scripts': [
+            'whaledo',
+        ],
+    },
     packages=['whaledo'],
 )
