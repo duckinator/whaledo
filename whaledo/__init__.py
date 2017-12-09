@@ -12,6 +12,10 @@ import subprocess
 ### Commands ###
 
 def run(argv):
+    if argv[1] == "pull":
+        subprocess.call(["docker", "pull", argv[2]])
+        return
+
     if len(argv) == 1:
         # lol this is a fucking Docker container because I'm a smartass.
         argv += ["help"]
@@ -23,7 +27,6 @@ def run(argv):
 
     mounts = ["-v", os.getcwd() + ":/tmp/work"]
     user_id = subprocess.check_output(["id", "-u"]).strip()
-    subprocess.call(["docker", "pull", repo])
     subprocess.call(["docker", "run", "--rm", "-it", *mounts, "-w", "/tmp/work", "-u", user_id, repo, *command])
 
 def main():
