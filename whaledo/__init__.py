@@ -11,15 +11,17 @@ import subprocess
 
 ### Commands ###
 
+def print_help():
+    print("Usage: whaledo USER/REPO COMMAND [ARGS...]")
+    print("       whaledo WHALEDO_REPO COMMAND [ARGS...]")
+    print("")
+    print("If you want an official repo, prefix it with \"library/\".")
+    print("E.g., to use the official Ruby image, you can do `whaledo library/ruby`.")
+
+def pull(argv):
+    subprocess.call(["docker", "pull", argv[2]])
+
 def run(argv):
-    if argv[1] == "pull":
-        subprocess.call(["docker", "pull", argv[2]])
-        return
-
-    if len(argv) == 1:
-        # lol this is a fucking Docker container because I'm a smartass.
-        argv += ["help"]
-
     _, repo, *command = argv
 
     if not "/" in repo:
@@ -29,8 +31,23 @@ def run(argv):
     user_id = subprocess.check_output(["id", "-u"]).strip()
     subprocess.call(["docker", "run", "--rm", "-it", *mounts, "-w", "/tmp/work", "-u", user_id, repo, *command])
 
+def handle(argv):
+    commands = {
+        "-h": print_help,
+        "--help": print_help,
+        "help": print_help,
+        "pull": pull,
+    }
+
+    if len(argv) < 2:
+        print_help()
+    elif argv[1] in commands:
+        commands[argv[1]](argv)
+    else:
+        run(argv)
+
 def main():
-    run(sys.argv)
+    handle(sys.argv)
 
 if __name__ == '__main__':
     main()
