@@ -21,9 +21,7 @@ def print_help():
 def pull(argv):
     subprocess.call(["docker", "pull", argv[2]])
 
-def run(argv):
-    _, repo, *command = argv
-
+def run(repo, command):
     if not "/" in repo:
         repo = "whaledo/" + repo
 
@@ -44,7 +42,8 @@ def handle(argv):
     elif argv[1] in commands:
         commands[argv[1]](argv)
     else:
-        run(argv)
+        _, repo, *command = argv
+        run(repo, command)
 
 def main():
     handle(sys.argv)
