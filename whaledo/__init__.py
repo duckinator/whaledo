@@ -27,7 +27,8 @@ def run(repo, command):
 
     mounts = ["-v", os.getcwd() + ":/tmp/work"]
     user_id = subprocess.check_output(["id", "-u"]).strip()
-    subprocess.call(["docker", "run", "--rm", "-it", *mounts, "-w", "/tmp/work", "-u", user_id, repo, *command])
+
+    subprocess.call(["docker", "run", "--rm", "-it"] + mounts + ["-w", "/tmp/work", "-u", user_id, repo] + command)
 
 def handle(argv):
     commands = {
@@ -42,7 +43,8 @@ def handle(argv):
     elif argv[1] in commands:
         commands[argv[1]](argv)
     else:
-        _, repo, *command = argv
+        repo = argv[1]
+        command = argv[2:]
         run(repo, command)
 
 def main():

@@ -28,5 +28,5 @@ setup(
         ],
     },
     packages=['whaledo'],
-    python_requires='>=3',
+    python_requires='>=2.7',
 )
