@@ -29,6 +29,7 @@ def run(repo, command):
 
     docker_cmd = ["docker", "run", "--rm", "-it"]
     docker_cmd += ["-v", os.getcwd() + ":/tmp/work"]
+    docker_cmd += ["-w", "/tmp/work"]
     docker_cmd += ["-u", user_id]
 
     if os.path.isfile("env.whaledo"):
