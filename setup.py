@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='whaledo',
-    version='5.0.0',
+    version='6.0.0',
     description='A program for working with Docker containers designed for isolating interactive tools.',
     author='Ellen Marie Dash',
     author_email='me@duckie.co',
