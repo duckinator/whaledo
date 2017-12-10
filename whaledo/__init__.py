@@ -25,10 +25,16 @@ def run(repo, command):
     if not "/" in repo:
         repo = "whaledo/" + repo
 
-    mounts = ["-v", os.getcwd() + ":/tmp/work"]
     user_id = subprocess.check_output(["id", "-u"]).strip()
 
-    subprocess.call(["docker", "run", "--rm", "-it"] + mounts + ["-w", "/tmp/work", "-u", user_id, repo] + command)
+    docker_cmd = ["docker", "run", "--rm", "-it"]
+    docker_cmd += ["-v", os.getcwd() + ":/tmp/work"]
+    docker_cmd += ["-u", user_id]
+
+    if os.path.isfile("env.whaledo"):
+        docker_cmd += ["--env-file", "env.whaledo"]
+
+    subprocess.call(docker_cmd + [repo] + command)
 
 def handle(argv):
     commands = {
