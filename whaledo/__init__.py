@@ -17,9 +17,10 @@ def print_help():
     print("")
     print("If you want an official repo, prefix it with \"library/\".")
     print("E.g., to use the official Ruby image, you can do `whaledo library/ruby`.")
+    return 0
 
 def pull(argv):
-    subprocess.call(["docker", "pull", argv[2]])
+    return subprocess.call(["docker", "pull", argv[2]])
 
 def run(repo, command):
     if not "/" in repo:
@@ -35,7 +36,7 @@ def run(repo, command):
     if os.path.isfile("env.whaledo"):
         docker_cmd += ["--env-file", "env.whaledo"]
 
-    subprocess.call(docker_cmd + [repo] + command)
+    return subprocess.call(docker_cmd + [repo] + command)
 
 def handle(argv):
     commands = {
@@ -46,16 +47,17 @@ def handle(argv):
     }
 
     if len(argv) < 2:
-        print_help()
+        return print_help()
     elif argv[1] in commands:
-        commands[argv[1]](argv)
+        return commands[argv[1]](argv)
     else:
         repo = argv[1]
         command = argv[2:]
-        run(repo, command)
+        return run(repo, command)
 
 def main():
-    handle(sys.argv)
+    return handle(sys.argv)
 
 if __name__ == '__main__':
-    main()
+    returncode = main()
+    exit(returncode)
